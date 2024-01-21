@@ -8,6 +8,7 @@ use crate::mods::host::config_interface::add_ipv6_address;
 use crate::mods::host::config_interface::delete_all_public_ipv6_addr;
 use crate::mods::host::config_interface::get_public_ipv6_addr;
 use crate::mods::host::radvd::config_radvd;
+use crate::mods::host::router::config_router;
 use crate::mods::network::ipv6::format_ipv6;
 use crate::mods::network::ipv6::generate_first_ipv6_with_prefix;
 use crate::mods::network::ipv6::generate_unique_random_subnet;
@@ -125,6 +126,11 @@ pub fn handle_router_advertisement(icmpv6_packet: &Icmpv6Packet) {
                 }
             }
         }
+
+        if config.features.router {
+            config_router(&config.next_interface, &subnet_prefix, subnet_prefix_length);
+        }
+
         if config.features.radvd {
             println!("debug 4");
             let radvd_prefix = subnet_prefix;

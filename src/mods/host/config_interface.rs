@@ -57,26 +57,6 @@ pub fn add_ipv6_address(
         .arg(interface)
         .output();
 
-    let _ = Command::new("ip")
-        .arg("-6")
-        .arg("route")
-        .arg("del")
-        .arg(format!("{}/{}", format_ipv6(address), prefix_length))
-        .arg("dev")
-        .arg(interface)
-        .output();
-
-    let _ = Command::new("ip")
-        .arg("-6")
-        .arg("route")
-        .arg("add")
-        .arg(format!("{}/{}", format_ipv6(address), prefix_length))
-        .arg("dev")
-        .arg(interface)
-        .arg("metric")
-        .arg("100")
-        .output();
-
     match output {
         Ok(output) if output.status.success() => {
             println!("Output: {}", String::from_utf8_lossy(&output.stdout));

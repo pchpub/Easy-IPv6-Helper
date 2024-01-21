@@ -22,6 +22,7 @@ pub struct Features {
     pub dhcpv6: bool,
     pub ndproxy: bool,
     pub config_interface: bool,
+    pub router: bool,
 }
 
 impl Config {
@@ -35,6 +36,7 @@ impl Config {
                 dhcpv6: true,
                 ndproxy: true,
                 config_interface: true,
+                router: true,
             },
         }
     }
