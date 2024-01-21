@@ -1,7 +1,8 @@
 #!/bin/bash
 
 check_docker_installed() {
-    if ! command -v docker &> /dev/null
+    docker -v
+    if [ $? -ne  0 ];
     then
         echo "Docker未安装。"
         return 1
