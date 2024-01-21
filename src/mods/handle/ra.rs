@@ -50,7 +50,6 @@ pub fn handle_router_advertisement(icmpv6_packet: &Icmpv6Packet) {
         let prefix_info = parse_prefix_information(&data);
         prefix_info.print();
         let config = CONFIG.lock().unwrap();
-        // println!("{:?}", config);
 
         {
             let ipv6s = match get_public_ipv6_addr(&config.next_interface) {
@@ -75,22 +74,7 @@ pub fn handle_router_advertisement(icmpv6_packet: &Icmpv6Packet) {
                 println!("The next interface's ipv6 address is not updated");
             }
         }
-        println!("debug 1.1");
-        // 生成2个随机的子网pd前缀 // fuck! 你妈的pd前缀怎么是64，电信你妈死了
         let subnet_prefix_length = config.subnet_prefix_length;
-        // println!("debug 1.2");
-        // let (subnet_prefix, subnet_prefix_length) = match generate_unique_random_subnet(
-        //     &prefix_info.prefix,
-        //     prefix_info.prefix_length,
-        //     subnet_prefix_length,
-        //     2,
-        // ) {
-        //     Ok(subnet_prefix) => subnet_prefix,
-        //     Err(e) => {
-        //         eprintln!("生成随机子网pd前缀失败: {}", e);
-        //         return;
-        //     }
-        // };
         let (subnet_prefix, subnet_prefix_length) = {
             if prefix_info.prefix_length >= 64 {
                 (prefix_info.prefix, 64)
@@ -103,7 +87,7 @@ pub fn handle_router_advertisement(icmpv6_packet: &Icmpv6Packet) {
                 ) {
                     Ok(subnet_prefix) => (subnet_prefix.0.get(0).unwrap().clone(), subnet_prefix.1),
                     Err(e) => {
-                        eprintln!("生成随机子网pd前缀失败: {}", e);
+                        eprintln!("Failed to generate subnet prefix : {}", e);
                         return;
                     }
                 }
@@ -115,7 +99,7 @@ pub fn handle_router_advertisement(icmpv6_packet: &Icmpv6Packet) {
                 match generate_first_ipv6_with_prefix(&subnet_prefix, subnet_prefix_length) {
                     Ok(ipv6) => ipv6,
                     Err(e) => {
-                        eprintln!("生成下一个接口的IPv6地址失败: {}", e);
+                        eprintln!("Failed to generate ipv6 address for next interface: {}", e);
                         return;
                     }
                 };
@@ -124,7 +108,7 @@ pub fn handle_router_advertisement(icmpv6_packet: &Icmpv6Packet) {
             match delete_all_public_ipv6_addr(config.next_interface.as_str()) {
                 Ok(_) => (),
                 Err(e) => {
-                    eprintln!("删除下一个接口的其它公共IPv6地址失败: {}", e);
+                    eprintln!("Failed to delete ipv6 address in next interface: {}", e);
                     return;
                 }
             };
@@ -136,21 +120,14 @@ pub fn handle_router_advertisement(icmpv6_packet: &Icmpv6Packet) {
             ) {
                 Ok(_) => (),
                 Err(e) => {
-                    eprintln!("附加IPv6地址失败: {}", e);
+                    eprintln!("Failed to add ipv6 address to next interface: {}", e);
                     return;
                 }
             }
         }
         if config.features.radvd {
             println!("debug 4");
-            let radvd_prefix =
-                match generate_first_ipv6_with_prefix(&subnet_prefix, subnet_prefix_length) {
-                    Ok(ipv6) => ipv6,
-                    Err(e) => {
-                        eprintln!("生成Radvd前缀失败: {}", e);
-                        return;
-                    }
-                };
+            let radvd_prefix = subnet_prefix;
             match config_radvd(
                 &config.next_interface,
                 &format_ipv6(&radvd_prefix),
@@ -158,7 +135,7 @@ pub fn handle_router_advertisement(icmpv6_packet: &Icmpv6Packet) {
             ) {
                 Ok(_) => (),
                 Err(e) => {
-                    eprintln!("配置Radvd失败: {}", e);
+                    eprintln!("Failed to config radvd: {}", e);
                 }
             };
         }
