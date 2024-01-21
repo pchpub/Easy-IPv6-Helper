@@ -1,0 +1,12 @@
+{
+    "subnet_prefix_length": 130,
+    "upper_interface": "ppp0",
+    "next_interface": "br-lan",
+    "features": {
+        "radvd": true,
+        "dhcpv6": true,
+        "ndproxy": true,
+        "config_interface": true,
+        "router": true
+    }
+}
