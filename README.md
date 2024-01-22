@@ -72,8 +72,8 @@ A helper to manage ipv6-pd.
 
 ## Contributing
 
-Guidelines for contributing to your project.
+Any contributions you make are **greatly appreciated**.
 
 ## License
 
-Information about the license for your project.
+This project is licensed under the GNU General Public License v3.0 license. see the [LICENSE](LICENSE) file for details.
